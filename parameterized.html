@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TradableBits Dynamic Embed</title>
+  <style>
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+  </style>
+</head>
+<body>
+  <!-- Placeholder container; its id will be updated before we call loadTradablebitsApp -->
+  <div id="embedded-app-PLACEHOLDER" style="width: 100%;"></div>
+
+  <!-- Load TradableBits script synchronously so the function is available below -->
+  <script src="https://tradablebits.com/embedded.js" type="text/javascript"></script>
+
+  <script type="text/javascript">
+    (function () {
+      // Read ?id=... from URL
+      const params = new URLSearchParams(window.location.search);
+      const rawId = params.get("id");
+
+      // Basic validation: must be all digits
+      if (!rawId || !/^\d+$/.test(rawId)) {
+        document.getElementById("embedded-app-PLACEHOLDER").innerHTML =
+          "<p style='color:red;padding:1rem'>Missing or invalid app ID. Use ?id=123</p>";
+        return;
+      }
+
+      // Normalize to integer (TradableBits expects a number)
+      const appId = parseInt(rawId, 10);
+
+      // Update the container's id to match the required pattern
+      const container = document.getElementById("embedded-app-PLACEHOLDER");
+      const containerId = `embedded-app-${appId}`;
+      container.id = containerId;
+
+      // Ensure the loader function is present (it should be, since the script tag above is synchronous)
+      if (typeof loadTradablebitsApp !== "function") {
+        console.error("TradableBits script failed to load.");
+        container.innerHTML = "<p style='color:red;padding:1rem'>Failed to load embed script.</p>";
+        return;
+      }
+
+      // Call the embed with the dynamic ID
+      loadTradablebitsApp(containerId, appId, "https://tradablebits.com");
+    })();
+  </script>
+</body>
+</html>
